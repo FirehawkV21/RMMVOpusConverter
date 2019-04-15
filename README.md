@@ -14,5 +14,5 @@ You can either use Visual Studio 2017 (or newer) to compile it or run the follow
 
 ```
 dotnet build -c Release
-dotnet run --project "MV Sneaky Opus"
+dotnet run --project "RMMVOpusConverter"
 ```
