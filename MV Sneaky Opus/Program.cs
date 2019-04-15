@@ -7,15 +7,16 @@ using System.Threading.Tasks;
 
 namespace SneakyConverter
 {
-    internal class Program
+    internal static class Program
     {
         private static string _converterLocation;
         private static string _sourceLocation;
         private static string _dropLocation;
         private static bool _isParallel;
         private static readonly ProcessStartInfo ConverterInfo = new ProcessStartInfo();
-        private static bool settingsSet;
-        private static string stringBuffer;
+        private static bool _settingsSet;
+        private static bool _diagnosticsMode;
+        private static string _stringBuffer;
         private static void Main(string[] args)
         {
             string standardFlags = "-c:a libopus -nostdin -y";
@@ -32,26 +33,53 @@ namespace SneakyConverter
                 {
                     switch (args[i])
                     {
+                        case "--DiagnosticsMode":
+                            if (_isParallel)
+                            {
+                                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                                Console.WriteLine("Turning off Parallel Mode as it may screw up ffmpeg's output.");
+                                _isParallel = false;
+                            }
+                            _diagnosticsMode = true;
+                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            Console.WriteLine("Diagnostics Mode is turned on. FFMPEG will print its output here.");
+                            break;
                         case "--Parallel":
+                            if (!_diagnosticsMode) { 
                             _isParallel = true;
-                            Console.WriteLine("Parallel mode is active.");
+                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                                Console.WriteLine("Parallel mode is active.");
+                            }
+                            else
+                            {
+                                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                                Console.WriteLine("Cannot turn on Parallel mode when Diagnostics mode is active.");
+                            }
                             break;
                         case "--ConverterLocation":
                             if (i < args.Length - 1 && !args[i + 1].Contains("--"))
                             {
-                                stringBuffer = args[i + 1].Replace("\"", "");
-                                if (Directory.Exists(stringBuffer)) _converterLocation = stringBuffer;
+                                _stringBuffer = args[i + 1].Replace("\"", "");
+                                if (Directory.Exists(_stringBuffer)) _converterLocation = _stringBuffer;
                                 else
                                 {
                                     Console.WriteLine("The folder does not exist.\nPress Enter/Return to exit");
                                     Console.ReadLine();
                                     Environment.Exit(0);
                                 }
-                                if (File.Exists(Path.Combine(_converterLocation, RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? "ffmpeg.exe" : "ffmpeg")))
-                                Console.WriteLine("The location for the converter is set.");
-                                else
+
+                                if (File.Exists(Path.Combine(_converterLocation,
+                                    RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ffmpeg.exe" : "ffmpeg")))
                                 {
-                                    Console.WriteLine("There is no FFMPEG in the folder.\nPress Enter/Return to exit");
+                                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                                    Console.WriteLine("The location for the converter is set.");
+                                }
+                                else { 
+
+                                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                                    Console.WriteLine("There is no FFMPEG in the folder.");
+                                    Console.ForegroundColor = ConsoleColor.White;
+                                    Console.WriteLine("Press Enter/Return to exit.");
                                     Console.ReadLine();
                                     Environment.Exit(0);
                                 }
@@ -60,15 +88,18 @@ namespace SneakyConverter
                         case "--SourceLocation":
                             if (i < args.Length - 1 && !args[i + 1].Contains("--"))
                             {
-                                stringBuffer = args[i + 1].Replace("\"", "");
-                                if (Directory.Exists(stringBuffer))
+                                _stringBuffer = args[i + 1].Replace("\"", "");
+                                if (Directory.Exists(_stringBuffer))
                                 {
-                                    _sourceLocation = stringBuffer;
+                                    _sourceLocation = _stringBuffer;
+                                    Console.ForegroundColor = ConsoleColor.DarkGreen;
                                     Console.WriteLine("The location for source is set.");
                                 }
                                 else
                                 {
+                                    Console.ForegroundColor = ConsoleColor.DarkRed;
                                     Console.WriteLine("The source location doesn't exist.");
+                                    Console.ForegroundColor = ConsoleColor.White;
                                     Console.WriteLine("Press Enter/Return to exit");
                                     Console.ReadLine();
                                     Environment.Exit(0);
@@ -78,20 +109,21 @@ namespace SneakyConverter
                         case "--OutputLocation":
                             if (i < args.Length - 1 && !args[i + 1].Contains("--"))
                             {
-                                stringBuffer = args[i + 1].Replace("\"", "");
-                                if (!Directory.Exists(stringBuffer)) Directory.CreateDirectory(stringBuffer);
-                                    _dropLocation = stringBuffer;
+                                _stringBuffer = args[i + 1].Replace("\"", "");
+                                if (!Directory.Exists(_stringBuffer)) Directory.CreateDirectory(_stringBuffer);
+                                    _dropLocation = _stringBuffer;
                                 Console.WriteLine("The location for the output is set.");
                             }
                             break;
                     }
                 }
                 if (_converterLocation != null && _sourceLocation != null && _dropLocation != null)
-                    settingsSet = true;
+                    _settingsSet = true;
+                Console.ResetColor();
                 Console.WriteLine();
             }
 
-            if (!settingsSet)
+            if (!_settingsSet)
             {
                 if (_converterLocation == null)
                 do
@@ -112,7 +144,11 @@ namespace SneakyConverter
 
                     if (_sourceLocation == null) Console.WriteLine("Please specify the location of the folder.\n");
                     else if (!Directory.Exists(_sourceLocation))
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine("The folder you've selected isn't present.\n");
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
                 } while (_sourceLocation == null || !Directory.Exists(_sourceLocation));
 
                 do
@@ -133,9 +169,13 @@ namespace SneakyConverter
 
             }
             ConverterInfo.FileName = Path.Combine(_converterLocation,
-                RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ffmpeg.exe" : "ffmpeg");            
-            ConverterInfo.CreateNoWindow = true;
-            ConverterInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ffmpeg.exe" : "ffmpeg");
+            if (!_diagnosticsMode)
+            {
+                ConverterInfo.CreateNoWindow = true;
+                ConverterInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            }
+
             string[] fileMap = Directory.GetFiles(_sourceLocation, "*.ogg", SearchOption.AllDirectories);
             try
             {
@@ -149,10 +189,10 @@ namespace SneakyConverter
                         string tempString = _dropLocation + fileLocBuffer + fileName;
                         if (!Directory.Exists(Path.Combine(_dropLocation, fileLocBuffer)))
                             Directory.CreateDirectory(Path.Combine(_dropLocation, fileLocBuffer));
-                        ConverterInfo.Arguments = standardFlags + " -i \"" + soundFile + "\" \"" + tempString + "\"";
-                        Console.WriteLine("[{0}]Thread No.{1} is converting sound file {2} to Opus...", DateTime.Now, Thread.CurrentThread.ManagedThreadId, soundFile);
+                        ConverterInfo.Arguments = "-i \"" + soundFile + "\" " + standardFlags +" \"" + tempString + "\"";
+                        Console.WriteLine("[{0}]Thread No.{1} is converting {2} to Opus...", DateTime.Now, Thread.CurrentThread.ManagedThreadId, soundFile);
                         Process.Start(ConverterInfo)?.WaitForExit();
-                        Console.WriteLine("[{0}]Thread No.{1} finished the conversion of {2}.", DateTime.Now, Thread.CurrentThread.ManagedThreadId, soundFile);
+                        Console.WriteLine("[{0}]Thread No.{1} finished the conversion of {2}.\n", DateTime.Now, Thread.CurrentThread.ManagedThreadId, soundFile);
                     });
                 }
                 else
@@ -165,17 +205,25 @@ namespace SneakyConverter
                         string tempString = _dropLocation + fileLocBuffer + fileName;
                         if (!Directory.Exists(Path.Combine(_dropLocation, fileLocBuffer)))
                             Directory.CreateDirectory(Path.Combine(_dropLocation, fileLocBuffer));
-                        ConverterInfo.Arguments = standardFlags + " -i \"" + soundFile + "\" \"" + tempString + "\"";
-                        Console.WriteLine("[{0}]Converting {1} to Opus...", DateTime.Now, soundFile);
+                        ConverterInfo.Arguments = "-i \"" + soundFile + "\" " + standardFlags + " \"" + tempString + "\"";
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write("[{0}] ", DateTime.Now);
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine("Converting {0} to Opus...", soundFile);
                         Process.Start(ConverterInfo)?.WaitForExit();
-                        Console.WriteLine("[{0}]Finished converting {1}.", DateTime.Now, soundFile);
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write("[{0}] ", DateTime.Now);
+                        Console.ForegroundColor = ConsoleColor.DarkGreen;
+                        Console.WriteLine("Finished converting {0}.", soundFile);
                     }
                 }
                 Console.WriteLine("\nThe task was completed.");
             }
             catch (Exception e)
             {
-                Console.WriteLine("\n" + e.ToString());
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine("\n" + e);
+                Console.ResetColor();
             }
             
             Console.WriteLine("Press Enter/Return to exit.");
