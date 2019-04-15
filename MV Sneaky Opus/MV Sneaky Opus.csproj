@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <RootNamespace>SneakyConverter</RootNamespace>
+    <AssemblyVersion>1.0.0.19105</AssemblyVersion>
+    <FileVersion>1.0.0.19105</FileVersion>
+    <StartupObject></StartupObject>
+    <AssemblyName>SneakyConverter</AssemblyName>
+    <PackageId>StudioACE.SneakyConversion</PackageId>
+    <Authors>AceOfAces</Authors>
+    <Company>Studio ACE</Company>
+    <Product>RPG Maker Tools</Product>
+  </PropertyGroup>
+
+</Project>
