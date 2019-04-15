@@ -19,6 +19,7 @@ namespace RMMVOpusConverter
         private static string _stringBuffer;
         private static void Main(string[] args)
         {
+            //This is the format of the flags used for FFMPEG.
             string standardFlags = "-c:a libopus -nostdin -y";
 
             Console.WriteLine("=====================================================");
@@ -45,9 +46,10 @@ namespace RMMVOpusConverter
                             Console.WriteLine("Diagnostics Mode is turned on. FFMPEG will print its output here.");
                             break;
                         case "--Parallel":
-                            if (!_diagnosticsMode) { 
-                            _isParallel = true;
-                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            if (!_diagnosticsMode)
+                            {
+                                _isParallel = true;
+                                Console.ForegroundColor = ConsoleColor.DarkGreen;
                                 Console.WriteLine("Parallel mode is active.");
                             }
                             else
@@ -74,7 +76,8 @@ namespace RMMVOpusConverter
                                     Console.ForegroundColor = ConsoleColor.DarkGreen;
                                     Console.WriteLine("The location for the converter is set.");
                                 }
-                                else { 
+                                else
+                                {
 
                                     Console.ForegroundColor = ConsoleColor.DarkRed;
                                     Console.WriteLine("There is no FFMPEG in the folder.");
@@ -111,7 +114,7 @@ namespace RMMVOpusConverter
                             {
                                 _stringBuffer = args[i + 1].Replace("\"", "");
                                 if (!Directory.Exists(_stringBuffer)) Directory.CreateDirectory(_stringBuffer);
-                                    _dropLocation = _stringBuffer;
+                                _dropLocation = _stringBuffer;
                                 Console.WriteLine("The location for the output is set.");
                             }
                             break;
@@ -126,19 +129,19 @@ namespace RMMVOpusConverter
             if (!_settingsSet)
             {
                 if (_converterLocation == null)
-                do
-                {
-                    //Ask the user where is the SDK. Check if the folder's there.
-                    Console.WriteLine("Where's the FFMPEG location? ");
-                    _converterLocation = Console.ReadLine();
-                    if (_converterLocation == null) Console.WriteLine("Please insert the path for FFMPEG please.\n");
-                    else if (!Directory.Exists(_converterLocation))
-                        Console.Write("The directory isn't there. Please select an existing folder.\n");
-                } while (_converterLocation == null || !Directory.Exists(_converterLocation));
+                    do
+                    {
+                        //Ask the user where is FFMPEG. Check if the folder's there.
+                        Console.WriteLine("Where's the FFMPEG location? ");
+                        _converterLocation = Console.ReadLine();
+                        if (_converterLocation == null) Console.WriteLine("Please insert the path for FFMPEG please.\n");
+                        else if (!Directory.Exists(_converterLocation))
+                            Console.Write("The directory isn't there. Please select an existing folder.\n");
+                    } while (_converterLocation == null || !Directory.Exists(_converterLocation));
 
                 do
                 {
-                    //Ask the user what project to compile. Check if the folder is there and there's a js folder.
+                    //Ask the user where are the audio files. Check if the folder is there.
                     Console.WriteLine("\nWhere are the files you want to convert to? ");
                     _sourceLocation = Console.ReadLine();
 
@@ -153,7 +156,7 @@ namespace RMMVOpusConverter
 
                 do
                 {
-                    //Ask the user what project to compile. Check if the folder is there and there's a js folder.
+                    //Ask the user where to put the processed audio files. If the folder isn't there create it.
                     Console.WriteLine("\nWhere to put the converted files?");
                     _dropLocation = Console.ReadLine();
                     if (_dropLocation == null)
@@ -168,6 +171,7 @@ namespace RMMVOpusConverter
                 Console.WriteLine();
 
             }
+            //Quick preparation of FFMPEG.
             ConverterInfo.FileName = Path.Combine(_converterLocation,
                 RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ffmpeg.exe" : "ffmpeg");
             if (!_diagnosticsMode)
@@ -176,6 +180,7 @@ namespace RMMVOpusConverter
                 ConverterInfo.WindowStyle = ProcessWindowStyle.Hidden;
             }
 
+            //Index the files to an array.
             string[] fileMap = Directory.GetFiles(_sourceLocation, "*.ogg", SearchOption.AllDirectories);
             try
             {
@@ -189,7 +194,7 @@ namespace RMMVOpusConverter
                         string tempString = _dropLocation + fileLocBuffer + fileName;
                         if (!Directory.Exists(Path.Combine(_dropLocation, fileLocBuffer)))
                             Directory.CreateDirectory(Path.Combine(_dropLocation, fileLocBuffer));
-                        ConverterInfo.Arguments = "-i \"" + soundFile + "\" " + standardFlags +" \"" + tempString + "\"";
+                        ConverterInfo.Arguments = "-i \"" + soundFile + "\" " + standardFlags + " \"" + tempString + "\"";
                         Console.WriteLine("[{0}]Thread No.{1} is converting {2} to Opus...", DateTime.Now, Thread.CurrentThread.ManagedThreadId, soundFile);
                         Process.Start(ConverterInfo)?.WaitForExit();
                         Console.WriteLine("[{0}]Thread No.{1} finished the conversion of {2}.", DateTime.Now, Thread.CurrentThread.ManagedThreadId, soundFile);
@@ -228,7 +233,7 @@ namespace RMMVOpusConverter
                 Console.WriteLine("\n" + e);
                 Console.ResetColor();
             }
-            
+
             Console.WriteLine("Press Enter/Return to exit.");
             Console.ReadLine();
         }
