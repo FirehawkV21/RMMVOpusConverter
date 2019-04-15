@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace SneakyConverter
 {
@@ -31,8 +32,7 @@ namespace SneakyConverter
                 if (_sourceLocation == null) Console.WriteLine("Please specify the location of the folder.\n");
                 else if (!Directory.Exists(_sourceLocation))
                     Console.WriteLine("The folder you've selected isn't present.\n");
-            } while (_sourceLocation == null || !Directory.Exists(_sourceLocation) ||
-                     !Directory.Exists(_sourceLocation));
+            } while (_sourceLocation == null || !Directory.Exists(_sourceLocation));
 
             do
             {
@@ -45,12 +45,13 @@ namespace SneakyConverter
                 else if (!Directory.Exists(_dropLocation))
                 {
                     Console.WriteLine("Creating folder...\n");
+                    Directory.CreateDirectory(_dropLocation);
                 }
             }
             while (_dropLocation == null);
 
-            string[] FileMap = Directory.GetFiles(_sourceLocation, "*.ogg", SearchOption.AllDirectories);
-            foreach (string soundFile in FileMap)
+            string[] fileMap = Directory.GetFiles(_sourceLocation, "*.ogg", SearchOption.AllDirectories);
+            foreach (string soundFile in fileMap)
             {
                 string fileLocBuffer = soundFile.Replace(_sourceLocation, "");
                 string fileName = Path.GetFileName(soundFile);
@@ -58,7 +59,7 @@ namespace SneakyConverter
                 string tempString = _dropLocation + fileLocBuffer + fileName;
                 if (!Directory.Exists(Path.Combine(_dropLocation, fileLocBuffer)))
                     Directory.CreateDirectory(Path.Combine(_dropLocation, fileLocBuffer));
-                Process.Start(Path.Combine(_converterLocation, "ffmpeg.exe"), "-i \"" + soundFile + "\" -c:a libopus -nostdin -y \"" + tempString + "\"")?.WaitForExit();
+                Process.Start(Path.Combine(_converterLocation, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ffmpeg.exe" : "ffmpeg"), "-i \"" + soundFile + "\" -c:a libopus -nostdin -y \"" + tempString + "\"")?.WaitForExit();
             }
         }
     }
