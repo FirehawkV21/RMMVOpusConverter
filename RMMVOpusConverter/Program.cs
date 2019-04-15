@@ -199,7 +199,9 @@ namespace RMMVOpusConverter
                             Directory.CreateDirectory(_dropLocation + fileLocBuffer);
                         ConverterInfo.Arguments = " -i \"" + soundFile + "\" " + standardFlags + " \"" + tempString + "\"";
                         Console.WriteLine("[{0}]Thread No.{1} is converting {2} to Opus...", DateTime.Now, Thread.CurrentThread.ManagedThreadId, soundFile);
-                        Process.Start(ConverterInfo)?.WaitForExit();
+                        var converterProcess = Process.Start(ConverterInfo);
+                        converterProcess.WaitForExit();
+                        if (converterProcess.ExitCode != 0) Console.WriteLine("[{0}]Thread No.{1} reports that FFMPEG failed to convert {2}. It returned code {3}.", DateTime.Now, Thread.CurrentThread.ManagedThreadId, converterProcess.ExitCode);
                         Console.WriteLine("[{0}]Thread No.{1} finished the conversion of {2}.", DateTime.Now, Thread.CurrentThread.ManagedThreadId, soundFile);
                     });
                 }
@@ -218,11 +220,22 @@ namespace RMMVOpusConverter
                         Console.Write("[{0}] ", DateTime.Now);
                         Console.ResetColor();
                         Console.WriteLine("Converting {0} to Opus...", soundFile);
-                        Process.Start(ConverterInfo)?.WaitForExit();
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.Write("[{0}] ", DateTime.Now);
-                        Console.ForegroundColor = ConsoleColor.DarkGreen;
-                        Console.WriteLine("Finished converting {0}.", soundFile);
+                        var converterProcess = Process.Start(ConverterInfo);
+                        converterProcess.WaitForExit();
+                        if (converterProcess.ExitCode != 0)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.Write("[{0}] ", DateTime.Now);
+                            Console.ForegroundColor = ConsoleColor.DarkRed;
+                            Console.WriteLine("FFMPEG failed to compile {0}. It returned error code {1}.", soundFile, converterProcess.ExitCode);
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.Write("[{0}] ", DateTime.Now);
+                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            Console.WriteLine("Finished converting {0}.", soundFile);
+                        }
                     }
                 }
 
