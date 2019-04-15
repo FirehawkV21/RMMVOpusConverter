@@ -13,6 +13,6 @@ It's a handy trick since Opus is supported in nwjs and web browsers and it provi
 You can either use Visual Studio 2017 (or newer) to compile it or run the following (make sure that you have the .NET Core 2.2 SDK):
 
 ```
-dotnet build
+dotnet build -c Release
 dotnet run --project "MV Sneaky Opus"
 ```
