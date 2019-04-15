@@ -192,7 +192,7 @@ namespace SneakyConverter
                         ConverterInfo.Arguments = "-i \"" + soundFile + "\" " + standardFlags +" \"" + tempString + "\"";
                         Console.WriteLine("[{0}]Thread No.{1} is converting {2} to Opus...", DateTime.Now, Thread.CurrentThread.ManagedThreadId, soundFile);
                         Process.Start(ConverterInfo)?.WaitForExit();
-                        Console.WriteLine("[{0}]Thread No.{1} finished the conversion of {2}.\n", DateTime.Now, Thread.CurrentThread.ManagedThreadId, soundFile);
+                        Console.WriteLine("[{0}]Thread No.{1} finished the conversion of {2}.", DateTime.Now, Thread.CurrentThread.ManagedThreadId, soundFile);
                     });
                 }
                 else
@@ -217,7 +217,10 @@ namespace SneakyConverter
                         Console.WriteLine("Finished converting {0}.", soundFile);
                     }
                 }
+
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
                 Console.WriteLine("\nThe task was completed.");
+                Console.ResetColor();
             }
             catch (Exception e)
             {
