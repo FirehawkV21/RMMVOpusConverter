@@ -65,7 +65,10 @@ namespace RMMVOpusConverter
                                 if (Directory.Exists(_stringBuffer)) _converterLocation = _stringBuffer;
                                 else
                                 {
-                                    Console.WriteLine("The folder does not exist.\nPress Enter/Return to exit");
+                                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                                    Console.WriteLine("The folder does not exist.");
+                                    Console.ResetColor();
+                                    Console.WriteLine("Press Enter/Return to exit.");
                                     Console.ReadLine();
                                     Environment.Exit(0);
                                 }
@@ -81,7 +84,7 @@ namespace RMMVOpusConverter
 
                                     Console.ForegroundColor = ConsoleColor.DarkRed;
                                     Console.WriteLine("There is no FFMPEG in the folder.");
-                                    Console.ForegroundColor = ConsoleColor.White;
+                                    Console.ResetColor();
                                     Console.WriteLine("Press Enter/Return to exit.");
                                     Console.ReadLine();
                                     Environment.Exit(0);
@@ -150,7 +153,7 @@ namespace RMMVOpusConverter
                     {
                         Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine("The folder you've selected isn't present.\n");
-                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.ResetColor();
                     }
                 } while (_sourceLocation == null || !Directory.Exists(_sourceLocation));
 
@@ -192,9 +195,9 @@ namespace RMMVOpusConverter
                         string fileName = Path.GetFileName(soundFile);
                         fileLocBuffer = fileLocBuffer.Replace(fileName, "");
                         string tempString = _dropLocation + fileLocBuffer + fileName;
-                        if (!Directory.Exists(Path.Combine(_dropLocation, fileLocBuffer)))
-                            Directory.CreateDirectory(Path.Combine(_dropLocation, fileLocBuffer));
-                        ConverterInfo.Arguments = "-i \"" + soundFile + "\" " + standardFlags + " \"" + tempString + "\"";
+                        if (!Directory.Exists(_dropLocation + fileLocBuffer))
+                            Directory.CreateDirectory(_dropLocation + fileLocBuffer);
+                        ConverterInfo.Arguments = " -i \"" + soundFile + "\" " + standardFlags + " \"" + tempString + "\"";
                         Console.WriteLine("[{0}]Thread No.{1} is converting {2} to Opus...", DateTime.Now, Thread.CurrentThread.ManagedThreadId, soundFile);
                         Process.Start(ConverterInfo)?.WaitForExit();
                         Console.WriteLine("[{0}]Thread No.{1} finished the conversion of {2}.", DateTime.Now, Thread.CurrentThread.ManagedThreadId, soundFile);
@@ -208,12 +211,12 @@ namespace RMMVOpusConverter
                         string fileName = Path.GetFileName(soundFile);
                         fileLocBuffer = fileLocBuffer.Replace(fileName, "");
                         string tempString = _dropLocation + fileLocBuffer + fileName;
-                        if (!Directory.Exists(Path.Combine(_dropLocation, fileLocBuffer)))
-                            Directory.CreateDirectory(Path.Combine(_dropLocation, fileLocBuffer));
-                        ConverterInfo.Arguments = "-i \"" + soundFile + "\" " + standardFlags + " \"" + tempString + "\"";
+                        if (!Directory.Exists(_dropLocation + fileLocBuffer))
+                            Directory.CreateDirectory(_dropLocation + fileLocBuffer);
+                        ConverterInfo.Arguments = " -i \"" + soundFile + "\" " + standardFlags + " \"" + tempString + "\"";
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.Write("[{0}] ", DateTime.Now);
-                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.ResetColor();
                         Console.WriteLine("Converting {0} to Opus...", soundFile);
                         Process.Start(ConverterInfo)?.WaitForExit();
                         Console.ForegroundColor = ConsoleColor.Cyan;
