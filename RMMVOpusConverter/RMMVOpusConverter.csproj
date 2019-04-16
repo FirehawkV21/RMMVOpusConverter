@@ -4,14 +4,15 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>RMMVOpusConverter</RootNamespace>
-    <AssemblyVersion>1.0.0.19105</AssemblyVersion>
-    <FileVersion>1.0.0.19105</FileVersion>
+    <AssemblyVersion>1.0.0.19106</AssemblyVersion>
+    <FileVersion>1.0.0.19106</FileVersion>
     <StartupObject></StartupObject>
     <AssemblyName>RMMVOpusConverter</AssemblyName>
     <PackageId>StudioACE.RMMVOpusConverter</PackageId>
     <Authors>AceOfAces</Authors>
     <Company>Studio ACE</Company>
     <Product>RPG Maker Tools</Product>
+    <Version>1.0.0-20190416</Version>
   </PropertyGroup>
 
 </Project>
