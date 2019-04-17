@@ -17,6 +17,7 @@ namespace RMMVOpusConverter
         private static bool _settingsSet;
         private static bool _diagnosticsMode;
         private static string _stringBuffer;
+
         private static void Main(string[] args)
         {
             //This is the format of the flags used for FFMPEG.
@@ -24,7 +25,7 @@ namespace RMMVOpusConverter
 
             Console.WriteLine("=====================================================");
             Console.WriteLine("= Convert to Opus and Disguise Tool for RPG Maker MV");
-            Console.WriteLine("= Version D1.00");
+            Console.WriteLine("= Version R1.00");
             Console.WriteLine("= Developed by AceOfAces.");
             Console.WriteLine("= Licensed under the MIT license.");
             Console.WriteLine("=====================================================\n");
@@ -41,6 +42,7 @@ namespace RMMVOpusConverter
                                 Console.WriteLine("Turning off Parallel Mode as it may screw up ffmpeg's output.");
                                 _isParallel = false;
                             }
+
                             _diagnosticsMode = true;
                             Console.ForegroundColor = ConsoleColor.DarkGreen;
                             Console.WriteLine("Diagnostics Mode is turned on. FFMPEG will print its output here.");
@@ -57,6 +59,7 @@ namespace RMMVOpusConverter
                                 Console.ForegroundColor = ConsoleColor.DarkYellow;
                                 Console.WriteLine("Cannot turn on Parallel mode when Diagnostics mode is active.");
                             }
+
                             break;
                         case "--ConverterLocation":
                             if (i < args.Length - 1 && !args[i + 1].Contains("--"))
@@ -90,6 +93,7 @@ namespace RMMVOpusConverter
                                     Environment.Exit(0);
                                 }
                             }
+
                             break;
                         case "--SourceLocation":
                             if (i < args.Length - 1 && !args[i + 1].Contains("--"))
@@ -111,6 +115,7 @@ namespace RMMVOpusConverter
                                     Environment.Exit(0);
                                 }
                             }
+
                             break;
                         case "--OutputLocation":
                             if (i < args.Length - 1 && !args[i + 1].Contains("--"))
@@ -120,9 +125,11 @@ namespace RMMVOpusConverter
                                 _dropLocation = _stringBuffer;
                                 Console.WriteLine("The location for the output is set.");
                             }
+
                             break;
                     }
                 }
+
                 if (_converterLocation != null && _sourceLocation != null && _dropLocation != null)
                     _settingsSet = true;
                 Console.ResetColor();
@@ -137,7 +144,8 @@ namespace RMMVOpusConverter
                         //Ask the user where is FFMPEG. Check if the folder's there.
                         Console.WriteLine("Where's the FFMPEG location? ");
                         _converterLocation = Console.ReadLine();
-                        if (_converterLocation == null) Console.WriteLine("Please insert the path for FFMPEG please.\n");
+                        if (_converterLocation == null)
+                            Console.WriteLine("Please insert the path for FFMPEG please.\n");
                         else if (!Directory.Exists(_converterLocation))
                             Console.Write("The directory isn't there. Please select an existing folder.\n");
                     } while (_converterLocation == null || !Directory.Exists(_converterLocation));
@@ -169,11 +177,12 @@ namespace RMMVOpusConverter
                         Console.WriteLine("Creating folder...\n");
                         Directory.CreateDirectory(_dropLocation);
                     }
-                }
-                while (_dropLocation == null);
+                } while (_dropLocation == null);
+
                 Console.WriteLine();
 
             }
+
             //Quick preparation of FFMPEG.
             ConverterInfo.FileName = Path.Combine(_converterLocation,
                 RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ffmpeg.exe" : "ffmpeg");
@@ -197,12 +206,18 @@ namespace RMMVOpusConverter
                         string tempString = _dropLocation + fileLocBuffer + fileName;
                         if (!Directory.Exists(_dropLocation + fileLocBuffer))
                             Directory.CreateDirectory(_dropLocation + fileLocBuffer);
-                        ConverterInfo.Arguments = " -i \"" + soundFile + "\" " + standardFlags + " \"" + tempString + "\"";
-                        Console.WriteLine("[{0}]Thread No.{1} is converting {2} to Opus...", DateTime.Now, Thread.CurrentThread.ManagedThreadId, soundFile);
+                        ConverterInfo.Arguments =
+                            " -i \"" + soundFile + "\" " + standardFlags + " \"" + tempString + "\"";
+                        Console.WriteLine("[{0}]Thread No.{1} is converting {2} to Opus...", DateTime.Now,
+                            Thread.CurrentThread.ManagedThreadId, soundFile);
                         var converterProcess = Process.Start(ConverterInfo);
                         converterProcess.WaitForExit();
-                        if (converterProcess.ExitCode != 0) Console.WriteLine("[{0}]Thread No.{1} reports that FFMPEG failed to convert {2}. It returned code {3}.", DateTime.Now, Thread.CurrentThread.ManagedThreadId, converterProcess.ExitCode);
-                        Console.WriteLine("[{0}]Thread No.{1} finished the conversion of {2}.", DateTime.Now, Thread.CurrentThread.ManagedThreadId, soundFile);
+                        if (converterProcess.ExitCode != 0)
+                            Console.WriteLine(
+                                "[{0}]Thread No.{1} reports that FFMPEG failed to convert {2}. It returned code {3}.",
+                                DateTime.Now, Thread.CurrentThread.ManagedThreadId, converterProcess.ExitCode);
+                        Console.WriteLine("[{0}]Thread No.{1} finished the conversion of {2}.", DateTime.Now,
+                            Thread.CurrentThread.ManagedThreadId, soundFile);
                     });
                 }
                 else
@@ -215,7 +230,8 @@ namespace RMMVOpusConverter
                         string tempString = _dropLocation + fileLocBuffer + fileName;
                         if (!Directory.Exists(_dropLocation + fileLocBuffer))
                             Directory.CreateDirectory(_dropLocation + fileLocBuffer);
-                        ConverterInfo.Arguments = " -i \"" + soundFile + "\" " + standardFlags + " \"" + tempString + "\"";
+                        ConverterInfo.Arguments =
+                            " -i \"" + soundFile + "\" " + standardFlags + " \"" + tempString + "\"";
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.Write("[{0}] ", DateTime.Now);
                         Console.ResetColor();
@@ -227,7 +243,8 @@ namespace RMMVOpusConverter
                             Console.ForegroundColor = ConsoleColor.Cyan;
                             Console.Write("[{0}] ", DateTime.Now);
                             Console.ForegroundColor = ConsoleColor.DarkRed;
-                            Console.WriteLine("FFMPEG failed to compile {0}. It returned error code {1}.", soundFile, converterProcess.ExitCode);
+                            Console.WriteLine("FFMPEG failed to compile {0}. It returned error code {1}.", soundFile,
+                                converterProcess.ExitCode);
                         }
                         else
                         {
@@ -250,6 +267,7 @@ namespace RMMVOpusConverter
                 Console.ResetColor();
             }
 
+            if (_settingsSet) return;
             Console.WriteLine("Press Enter/Return to exit.");
             Console.ReadLine();
         }
