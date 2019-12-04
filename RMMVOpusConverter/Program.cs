@@ -23,12 +23,12 @@ namespace RMMVOpusConverter
             //This is the format of the flags used for FFMPEG.
             string standardFlags = "-c:a libopus -nostdin -y";
 
-            Console.WriteLine("=====================================================");
-            Console.WriteLine("= Convert to Opus and Disguise Tool for RPG Maker MV");
-            Console.WriteLine("= Version R1.00 Update 1");
+            Console.WriteLine("========================================================");
+            Console.WriteLine("= Opus Conversion and Preparation Tool for RPG Maker MV");
+            Console.WriteLine("= Version R1.00 Update 2");
             Console.WriteLine("= Developed by AceOfAces.");
             Console.WriteLine("= Licensed under the MIT license.");
-            Console.WriteLine("=====================================================\n");
+            Console.WriteLine("========================================================\n");
             if (args.Length >= 1)
             {
                 for (int i = 0; i < args.Length; i++)
