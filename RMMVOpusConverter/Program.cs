@@ -27,7 +27,7 @@ namespace RMMVOpusConverter
 
             Console.WriteLine("========================================================");
             Console.WriteLine("= Opus Conversion and Preparation Tool for RPG Maker MV");
-            Console.WriteLine("= Version R1.00 Update 2");
+            Console.WriteLine("= Version R1.00 Update 3");
             Console.WriteLine("= Developed by AceOfAces.");
             Console.WriteLine("= Licensed under the MIT license.");
             Console.WriteLine("========================================================\n");
