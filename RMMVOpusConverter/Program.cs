@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,7 +18,7 @@ namespace RMMVOpusConverter
         private static readonly ProcessStartInfo ConverterInfo = new ProcessStartInfo();
         private static bool _settingsSet;
         private static bool _diagnosticsMode;
-        private static string _stringBuffer;
+        private static StringBuilder _stringBuffer = new StringBuilder();
 
         private static void Main(string[] args)
         {
@@ -64,8 +66,13 @@ namespace RMMVOpusConverter
                         case "--ConverterLocation":
                             if (i < args.Length - 1 && !args[i + 1].Contains("--"))
                             {
-                                _stringBuffer = args[i + 1].Replace("\"", "");
-                                if (Directory.Exists(_stringBuffer)) _converterLocation = _stringBuffer;
+                                _stringBuffer.Insert(0, args[i + 1]);
+                                _stringBuffer.Replace("\"", "");
+                                if (Directory.Exists(_stringBuffer.ToString()))
+                                {
+                                    _converterLocation = _stringBuffer.ToString();
+                                    _stringBuffer.Clear();
+                                }
                                 else
                                 {
                                     Console.ForegroundColor = ConsoleColor.DarkRed;
@@ -98,12 +105,13 @@ namespace RMMVOpusConverter
                         case "--SourceLocation":
                             if (i < args.Length - 1 && !args[i + 1].Contains("--"))
                             {
-                                _stringBuffer = args[i + 1].Replace("\"", "");
-                                if (Directory.Exists(_stringBuffer))
+                                _stringBuffer.Insert(0, args[i + 1]);
+                                if (Directory.Exists(_stringBuffer.ToString()))
                                 {
-                                    _sourceLocation = _stringBuffer;
+                                    _sourceLocation = _stringBuffer.ToString();
                                     Console.ForegroundColor = ConsoleColor.DarkGreen;
                                     Console.WriteLine("The location for source is set.");
+                                    _stringBuffer.Clear();
                                 }
                                 else
                                 {
@@ -120,10 +128,11 @@ namespace RMMVOpusConverter
                         case "--OutputLocation":
                             if (i < args.Length - 1 && !args[i + 1].Contains("--"))
                             {
-                                _stringBuffer = args[i + 1].Replace("\"", "");
-                                if (!Directory.Exists(_stringBuffer)) Directory.CreateDirectory(_stringBuffer);
-                                _dropLocation = _stringBuffer;
+                                _stringBuffer.Insert(0, args[i + 1].Replace("\"", ""));
+                                if (!Directory.Exists(_stringBuffer.ToString())) Directory.CreateDirectory(_stringBuffer.ToString());
+                                _dropLocation = _stringBuffer.ToString();
                                 Console.WriteLine("The location for the output is set.");
+                                _stringBuffer.Clear();
                             }
 
                             break;
@@ -193,21 +202,21 @@ namespace RMMVOpusConverter
             }
 
             //Index the files to an array.
-            string[] fileMap = Directory.GetFiles(_sourceLocation, "*.ogg", SearchOption.AllDirectories);
+            IEnumerable<string> fileMap = Directory.EnumerateFiles(_sourceLocation, "*.ogg", SearchOption.AllDirectories);
             try
             {
                 if (_isParallel)
                 {
                     Parallel.ForEach(fileMap, soundFile =>
                     {
-                        string fileLocBuffer = soundFile.Replace(_sourceLocation, "");
-                        string fileName = Path.GetFileName(soundFile);
-                        fileLocBuffer = fileLocBuffer.Replace(fileName, "");
-                        string tempString = _dropLocation + fileLocBuffer + fileName;
-                        if (!Directory.Exists(_dropLocation + fileLocBuffer))
-                            Directory.CreateDirectory(_dropLocation + fileLocBuffer);
+                        _stringBuffer.Insert(0, soundFile);
+                        _stringBuffer.Replace(_sourceLocation, _dropLocation);
+                        _stringBuffer.Replace(Path.GetFileName(soundFile), "");
+                        if (!Directory.Exists(_stringBuffer.ToString()))
+                            Directory.CreateDirectory(_stringBuffer.ToString());
+                        _stringBuffer.Append(Path.GetFileName(soundFile));
                         ConverterInfo.Arguments =
-                            " -i \"" + soundFile + "\" " + standardFlags + " \"" + tempString + "\"";
+                            " -i \"" + soundFile + "\" " + standardFlags + " \"" + _stringBuffer + "\"";
                         Console.WriteLine("[{0}]Thread No.{1} is converting {2} to Opus...", DateTime.Now,
                             Thread.CurrentThread.ManagedThreadId, soundFile);
                         var converterProcess = Process.Start(ConverterInfo);
@@ -215,23 +224,24 @@ namespace RMMVOpusConverter
                         if (converterProcess.ExitCode != 0)
                             Console.WriteLine(
                                 "[{0}]Thread No.{1} reports that FFMPEG failed to convert {2}. It returned code {3}.",
-                                DateTime.Now, Thread.CurrentThread.ManagedThreadId, converterProcess.ExitCode);
+                                DateTime.Now, Thread.CurrentThread.ManagedThreadId, soundFile, converterProcess.ExitCode);
                         Console.WriteLine("[{0}]Thread No.{1} finished the conversion of {2}.", DateTime.Now,
                             Thread.CurrentThread.ManagedThreadId, soundFile);
+                        _stringBuffer.Clear();
                     });
                 }
                 else
                 {
                     foreach (string soundFile in fileMap)
                     {
-                        string fileLocBuffer = soundFile.Replace(_sourceLocation, "");
-                        string fileName = Path.GetFileName(soundFile);
-                        fileLocBuffer = fileLocBuffer.Replace(fileName, "");
-                        string tempString = _dropLocation + fileLocBuffer + fileName;
-                        if (!Directory.Exists(_dropLocation + fileLocBuffer))
-                            Directory.CreateDirectory(_dropLocation + fileLocBuffer);
+                        _stringBuffer.Insert(0, soundFile);
+                        _stringBuffer.Replace(_sourceLocation, _dropLocation);
+                        _stringBuffer.Replace(Path.GetFileName(soundFile), "");
+                        if (!Directory.Exists(_stringBuffer.ToString()))
+                            Directory.CreateDirectory(_stringBuffer.ToString());
+                        _stringBuffer.Append(Path.GetFileName(soundFile));
                         ConverterInfo.Arguments =
-                            " -i \"" + soundFile + "\" " + standardFlags + " \"" + tempString + "\"";
+                            " -i \"" + soundFile + "\" " + standardFlags + " \"" + _stringBuffer + "\"";
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.Write("[{0}] ", DateTime.Now);
                         Console.ResetColor();
@@ -253,7 +263,10 @@ namespace RMMVOpusConverter
                             Console.ForegroundColor = ConsoleColor.DarkGreen;
                             Console.WriteLine("Finished converting {0}.", soundFile);
                         }
+                        _stringBuffer.Clear();
                     }
+
+
                 }
 
                 Console.ForegroundColor = ConsoleColor.DarkGreen;

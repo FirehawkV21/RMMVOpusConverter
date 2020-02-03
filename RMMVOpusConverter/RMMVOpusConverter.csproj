@@ -4,8 +4,8 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>RMMVOpusConverter</RootNamespace>
-    <AssemblyVersion>1.0.2.19339</AssemblyVersion>
-    <FileVersion>1.0.2.19339</FileVersion>
+    <AssemblyVersion>1.0.2.20034</AssemblyVersion>
+    <FileVersion>1.0.2.20034</FileVersion>
     <StartupObject></StartupObject>
     <AssemblyName>RMMVOpusConverter</AssemblyName>
     <PackageId>StudioACE.RMMVOpusConverter</PackageId>
