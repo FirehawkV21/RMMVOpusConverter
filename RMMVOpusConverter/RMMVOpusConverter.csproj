@@ -2,17 +2,17 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>.net5</TargetFramework>
     <RootNamespace>RMMVOpusConverter</RootNamespace>
-    <AssemblyVersion>1.0.3.20034</AssemblyVersion>
-    <FileVersion>1.0.3.20034</FileVersion>
+    <AssemblyVersion>1.0.5.20267</AssemblyVersion>
+    <FileVersion>1.0.5.20267</FileVersion>
     <StartupObject></StartupObject>
     <AssemblyName>RMMVOpusConverter</AssemblyName>
     <PackageId>StudioACE.RMMVOpusConverter</PackageId>
     <Authors>AceOfAces</Authors>
     <Company>Studio ACE</Company>
     <Product>RPG Maker Tools</Product>
-    <Version>1.0.3-20200203</Version>
+    <Version>1.0.5-20200923</Version>
     <PackageProjectUrl>https://studioace.wordpress.com/projects/rmmvopusconverter/</PackageProjectUrl>
     <Copyright>Copyright © 2020 Studio ACE</Copyright>
     <Description>An FFMPEG wrapper tool that converts OGG Vorbis files to Opus. For RPG Maker MV projects.</Description>
@@ -21,7 +21,7 @@
     <TieredCompilation>true</TieredCompilation>
     <TieredCompilationQuickJit>true</TieredCompilationQuickJit>
     <PublishReadyToRun>true</PublishReadyToRun>
-    <PublishTrimmed>true</PublishTrimmed>
+    <PublishTrimmed>false</PublishTrimmed>
   </PropertyGroup>
 
 </Project>
