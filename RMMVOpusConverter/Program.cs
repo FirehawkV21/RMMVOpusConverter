@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RMMVOpusConverter;
 
@@ -27,7 +22,7 @@ internal static class Program
 
         Console.WriteLine("========================================================");
         Console.WriteLine("= Opus Conversion and Preparation Tool for RPG Maker MV");
-        Console.WriteLine("= Version R1.01");
+        Console.WriteLine("= Version R1.02");
         Console.WriteLine("= Developed by AceOfAces.");
         Console.WriteLine("= Licensed under the MIT license.");
         Console.WriteLine("========================================================\n");
